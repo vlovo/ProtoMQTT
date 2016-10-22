@@ -1,0 +1,22 @@
+
+message RobotMsg{
+
+	required int32 messageId = 1;
+    required string deviceName = 2;
+	required string  timestamp = 3;
+	
+	
+	enum RobotStates{
+	  Unkown =0;
+      Error=1;
+      Connected=2;
+      Idle=3;
+      Moving=4;
+      	};
+	
+	required RobotStates robotState = 4;
+	repeated double position = 5;
+	 
+
+	 
+}
