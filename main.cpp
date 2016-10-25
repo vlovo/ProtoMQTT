@@ -3,20 +3,14 @@
 #include "RobotMsg.pb.h" 
 #include "MQTTClient.h"
 
-double func(double invalue)
-{
-	return 2*invalue;
-}
-
-
+ 
 int setupMQTT(MQTTClient &roboClient)
 {
-	//MQTTClient roboClient;
 	MQTTClient_connectOptions opts = MQTTClient_connectOptions_initializer;
 	MQTTClient_willOptions wopts = MQTTClient_willOptions_initializer;
-	std::string  macadress=  "roboClient";//netadapter.getMACAddress();
+	std::string  macadress=  "e3::34::43::a2";
 
-	//"tcp://192.168.178.24:1884"
+	 
 	int rc = MQTTClient_create(&roboClient, "tcp://iot.eclipse.org:1883", macadress.c_str(), MQTTCLIENT_PERSISTENCE_DEFAULT, NULL);
 
 	opts.keepAliveInterval = 20;
@@ -30,13 +24,13 @@ int setupMQTT(MQTTClient &roboClient)
 
 	try
 	{
-		rc = MQTTClient_connect(roboClient, &opts);
+		int rc = MQTTClient_connect(roboClient, &opts);
 
 		if(rc != MQTTCLIENT_SUCCESS)  std::cout << " error \n";
 	}
 	catch(...)
 	{
-		rc = -1;
+		 
 	}
 
 	return  0;
@@ -44,13 +38,12 @@ int setupMQTT(MQTTClient &roboClient)
 
 int main(int argc, char** argv)
 {
-	int *ptr = nullptr;
-	auto f= 1000/30.0;
-	std::cout << "Hello ProtoMQTT " << f << " " << func(f) << "  \n";
+	 
+	std::cout << "Hello ProtoMQTT  \n";
 
 	RobotMsg msg;
     std::cout << "byte size is " <<  msg.ByteSize() << "\n";
-	msg.set_timestamp(3423435);
+	 
 	msg.set_robotstate(RobotMsg_RobotStates_Unkown);
 	msg.set_devicename(std::string("Kraftwerk"));
 	std::cout << "byte size is " <<  msg.ByteSize() << "\n";
@@ -65,7 +58,7 @@ int main(int argc, char** argv)
 
 		do 
 		{
-			msg.set_timestamp(i++);
+			 
 			MQTTClient_deliveryToken dt;
 			MQTTClient_message pubmsg = MQTTClient_message_initializer;
 			pubmsg.payload = (void*)(msg.SerializeAsString()).c_str();

@@ -18,11 +18,11 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 
 
-find_path(PAHO_MQTT_INCLUDE_DIRS MQTTClient.h)
-find_library(PAHO_MQTT_LIBRARIES NAMES paho-mqtt3c.lib) 
-
-
-include_directories(${PAHO_MQTT_INCLUDE_DIRS})
+find_path(PAHO_MQTT_INCLUDE_DIR MQTTClient.h)
+find_library(PAHO_MQTT_SYNC_LIBRARY NAMES paho-mqtt3c.lib) 
+find_library(PAHO_MQTT_ASYNC_LIBRARY NAMES paho-mqtt3a.lib) 
+SET(PAHO_MQTT_LIBRARIES ${PAHO_MQTT_SYNC_LIBRARY} ${PAHO_MQTT_ASYNC_LIBRARY})
+include_directories(${PAHO_MQTT_INCLUDE_DIR})
 
 add_executable(ProtoMQTT main.cpp ${PROTO_SRCS})
 target_link_libraries(ProtoMQTT ${PROTOBUF_LIBRARIES} ${PAHO_MQTT_LIBRARIES})
