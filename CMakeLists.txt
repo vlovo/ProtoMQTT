@@ -7,7 +7,7 @@ project(${PROJECT})
  
  
 
-SET(PROTOBUF_SRC_ROOT_FOLDER "X:/protobuf-3.0.0")
+SET(PROTOBUF_SRC_ROOT_FOLDER "X:/protobuf")
 find_package(Protobuf REQUIRED)
 include_directories(${PROTOBUF_INCLUDE_DIRS})
 

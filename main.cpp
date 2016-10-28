@@ -36,13 +36,16 @@ int setupMQTT(MQTTClient &roboClient)
 	return  0;
 }
 
-int main(int argc, char** argv)
-{
-	 
-	std::cout << "Hello ProtoMQTT  \n";
-
-	RobotMsg msg;
-    std::cout << "byte size is " <<  msg.ByteSize() << "\n";
+	
+	int main(int argc, char** argv)
+	{
+		 
+		std::cout << "Hello ProtoMQTT  \n";
+	
+		RobotMsg msg;
+	    std::cout << "byte size is " <<  msg.ByteSize() << "\n";
+		std::cout << "size is "  << sizeof(msg) << "\n";
+	
 	 
 	msg.set_robotstate(RobotMsg_RobotStates_Unkown);
 	msg.set_devicename(std::string("Kraftwerk"));
