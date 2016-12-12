@@ -6,7 +6,18 @@ set(PROJECT ProtoMQTT)
 project(${PROJECT})
  
  
+find_package(Boost)
+include_directories(${Boost_INCLUDE_DIRS})
+ if(NOT DEFINED Boost_LIBRARY_DIRS)
 
+FIND_PATH(Boost_LIBRARY_DIRS
+  NAMES
+  libboost_thread-vc100-mt.lib      
+  PATHS ${Boost_INCLUDE_DIRS}
+  )
+endif(NOT DEFINED Boost_LIBRARY_DIRS)
+link_directories(${Boost_LIBRARY_DIRS})
+ 
 SET(PROTOBUF_SRC_ROOT_FOLDER "X:/protobuf")
 find_package(Protobuf REQUIRED)
 include_directories(${PROTOBUF_INCLUDE_DIRS})
