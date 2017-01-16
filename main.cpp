@@ -71,17 +71,8 @@ public:
 
         if(position.size() >0)
         {
-            std::cout << "move to " << position[0]  << " " << position[1] << "\n";
-
-            mRobotMessage.mutable_position()->Clear();
-            mRobotMessage.mutable_position()->Reserve(position.size());
-
-            memcpy(mRobotMessage.mutable_position()->mutable_data(),
-                   position.data(),
-                   position.size()*sizeof(mRobotMessage.position(0)));
-
-            std::cout <<  "1" <<  mRobotMessage.position(0) << "  2 "  << mRobotMessage.position(1) << "  3 " << mRobotMessage.position(2) << " \n";
-
+            std::cout << "move to " << position[0]  << "\n";
+ 
         }
 
         return(ret);
@@ -90,24 +81,30 @@ public:
 
     int publishMessage( )
     {
+        int rc = 0;
+
         ptime t0 = microsec_clock::local_time();
         std::string  timeString  = to_simple_string(t0);
 
         mRobotMessage.set_timestamp(timeString);
 
-        MQTTClient_deliveryToken dt;
-        MQTTClient_message pubmsg = MQTTClient_message_initializer;
-        pubmsg.payload = (void*)(mRobotMessage.SerializeAsString()).c_str();
-        pubmsg.payloadlen =(int)(mRobotMessage.SerializeAsString()).size();
-        pubmsg.retained = 0;
 
-        std::string topic = "Robo/data";
-        int rc=0;
+        MQTTClient_message pubmsg = MQTTClient_message_initializer;
+
+
+        mRobotMessage.SerializeToArray(pubmsg.payload,mRobotMessage.ByteSize());
+        pubmsg.payloadlen = mRobotMessage.ByteSize();
+
+        pubmsg.payload =(void*)( (mRobotMessage.SerializeAsString()).c_str());
+        pubmsg.payloadlen =static_cast<int>( (mRobotMessage.SerializeAsString()).size());
+
 
         if(nullptr != mMQTTClient)
         {
 
+            MQTTClient_deliveryToken dt =0;
 
+            std::string topic = "Robo/data";
             rc = MQTTClient_publish(mMQTTClient,
                                     topic.c_str(),
                                     pubmsg.payloadlen,
@@ -116,10 +113,6 @@ public:
                                     pubmsg.retained,
                                     &dt);
 
-            if (pubmsg.qos > 0)
-            {
-                rc = MQTTClient_waitForCompletion(mMQTTClient, dt, 5000L);
-            }
         }
         else
         {
@@ -136,19 +129,12 @@ public:
     static int onMessageArrived(void* context, char* topic , int tlen, MQTTClient_message *msg)
     {
 
-        RobotCtrl *caller = (RobotCtrl*) context;
+        RobotCtrl *parent = (RobotCtrl*) context;
 
         std::string _topic(topic);
         RobotMsg _msg;
-#ifndef REAL
-        _msg.add_position(1);
-        _msg.add_position(2);
-        _msg.add_position(3);
 
-
-#else
         _msg.ParseFromArray(msg->payload,msg->payloadlen);
-#endif
 
         std::vector<double> p(_msg.position_size(),0);
 
@@ -156,7 +142,14 @@ public:
                _msg.mutable_position()->mutable_data(),
                _msg.position_size()*sizeof(double));
 
-        caller->move(p);
+
+        // setter with index and value
+        //_msg.set_position(0,double(0.0);
+
+        // dynamically add element
+        //  _msg.add_position(double(0.0));
+
+        parent->move(p);
 
 
         return(1);
@@ -235,7 +228,9 @@ int main(int argc, char** argv)
     std::cout << " msg byte size is " <<  msg.ByteSize() << "\n";
 
 
+    std::string m = msg.SerializeAsString();
 
+    std::string m1 = std::string("Hello world");
 
 
 
@@ -277,20 +272,17 @@ int main(int argc, char** argv)
 
     int ec = MQTTClient_subscribe(mqttClient,"Robo/Input",0);
 
-    int i=0;
 
-    do
+
+    for(;;)
     {
 
-
-
         Sleep(500);
-
 
         robotControler.publishMessage();
 
     }
-    while (1);
+
 
 
 
